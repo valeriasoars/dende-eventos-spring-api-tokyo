@@ -1,8 +1,9 @@
 package tokyo_spring_api.dende_eventos.model;
 
-import br.com.softhouse.dende.model.dto.AlterarPerfilOrganizadorDTO;
-import br.com.softhouse.dende.model.enums.Sexo;
-import br.com.softhouse.dende.model.enums.StatusEvento;
+import tokyo_spring_api.dende_eventos.model.dto.AlterarPerfilOrganizadorDTO;
+import tokyo_spring_api.dende_eventos.model.enums.Sexo;
+import tokyo_spring_api.dende_eventos.model.enums.StatusEvento;
+import jakarta.persistence.*;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -10,9 +11,15 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Entity
+@DiscriminatorValue("ORGANIZADOR")
 public class UsuarioOrganizador extends Usuario {
 
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "empresa_cnpj")
     private Empresa empresa;
+
+    @OneToMany(mappedBy = "usuarioOrganizador")
     private final List<Evento> eventos = new ArrayList<>();
 
     public UsuarioOrganizador() {
@@ -30,7 +37,6 @@ public class UsuarioOrganizador extends Usuario {
     }
 
     public Empresa getEmpresa(){return empresa;}
-
 
     public void alterarPerfil(AlterarPerfilOrganizadorDTO dto) {
         if (dto.nome() != null) setNome(dto.nome());

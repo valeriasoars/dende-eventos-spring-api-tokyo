@@ -1,12 +1,18 @@
 package tokyo_spring_api.dende_eventos.model;
 
-import br.com.softhouse.dende.model.dto.AlterarPerfilComumDTO;
-import br.com.softhouse.dende.model.enums.Sexo;
+import tokyo_spring_api.dende_eventos.model.dto.AlterarPerfilComumDTO;
+import tokyo_spring_api.dende_eventos.model.enums.Sexo;
+import tokyo_spring_api.dende_eventos.model.enums.StatusIngresso;
+import jakarta.persistence.DiscriminatorValue;
+import jakarta.persistence.Entity;
+
 import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Entity
+@DiscriminatorValue("COMUM")
 public class UsuarioComum extends Usuario {
 
     public UsuarioComum() {
@@ -32,7 +38,7 @@ public class UsuarioComum extends Usuario {
         return todos.stream()
                 .sorted(Comparator
                         .comparingInt((Ingresso ingresso) -> {
-                            boolean ingressoAtivo = ingresso.getStatus() == br.com.softhouse.dende.model.enums.StatusIngresso.ATIVO;
+                            boolean ingressoAtivo = ingresso.getStatus() == StatusIngresso.ATIVO;
                             boolean eventoAtivo = ingresso.getEvento().estaAtivo();
                             return (ingressoAtivo && eventoAtivo) ? 0 : 1;
                         })

@@ -1,5 +1,11 @@
 package tokyo_spring_api.dende_eventos.mappers;
 
+import tokyo_spring_api.dende_eventos.model.Evento;
+import tokyo_spring_api.dende_eventos.model.UsuarioOrganizador;
+import tokyo_spring_api.dende_eventos.model.dto.request.CadastrarUsuarioOrganizadorRequestDto;
+import tokyo_spring_api.dende_eventos.model.dto.response.EventoOrganizadorResponseDTO;
+import tokyo_spring_api.dende_eventos.model.dto.response.PerfilOrganizadorResponseDTO;
+
 public class UsuarioOrganizadorMapper {
     public static UsuarioOrganizador toModel(CadastrarUsuarioOrganizadorRequestDto dto) {
         return new UsuarioOrganizador(
@@ -36,7 +42,7 @@ public class UsuarioOrganizadorMapper {
     }
 
     public static EventoOrganizadorResponseDTO toListarEventoOrganizadorDTO(Evento evento) {
-        return new  EventoOrganizadorResponseDTO(
+        return new EventoOrganizadorResponseDTO(
                 evento.getNome(),
                 evento.getDataInicio(),
                 evento.getDataFinal(),

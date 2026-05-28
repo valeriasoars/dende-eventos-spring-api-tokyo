@@ -1,5 +1,9 @@
 package tokyo_spring_api.dende_eventos.builders;
 
+import tokyo_spring_api.dende_eventos.model.Evento;
+import tokyo_spring_api.dende_eventos.model.enums.ModalidadeEvento;
+import tokyo_spring_api.dende_eventos.model.enums.TipoEvento;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
@@ -90,8 +94,8 @@ public class EventoBuilder {
                 dataInicio, dataFinal,
                 tipo, modalidade,
                 capacidadeMaxima, localAcesso,
-                precoIngresso, permiteEstorno, taxaEstorno,
-                eventoPrincipal
+                precoIngresso, permiteEstorno,
+                taxaEstorno, eventoPrincipal
         );
     }
 }

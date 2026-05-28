@@ -1,7 +1,16 @@
 package tokyo_spring_api.dende_eventos.model;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+
+@Entity
+@Table(name = "empresas")
 public class Empresa {
+
+    @Id
     private String cnpj;
+
     private String razaoSocial;
     private String nomeFantasia;
 

@@ -1,9 +1,10 @@
 package tokyo_spring_api.dende_eventos.model;
 
-import br.com.softhouse.dende.model.enums.ModalidadeEvento;
-import br.com.softhouse.dende.model.enums.StatusEvento;
-import br.com.softhouse.dende.model.enums.StatusIngresso;
-import br.com.softhouse.dende.model.enums.TipoEvento;
+import tokyo_spring_api.dende_eventos.model.enums.ModalidadeEvento;
+import tokyo_spring_api.dende_eventos.model.enums.StatusEvento;
+import tokyo_spring_api.dende_eventos.model.enums.StatusIngresso;
+import tokyo_spring_api.dende_eventos.model.enums.TipoEvento;
+import jakarta.persistence.*;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -13,24 +14,45 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+@Entity
+@Table(name = "eventos")
 public class Evento {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
+
     private String nome;
     private String descricao;
     private String paginaEvento;
     private LocalDateTime dataInicio;
     private LocalDateTime dataFinal;
+
+    @Enumerated(EnumType.STRING)
     private TipoEvento tipo;
+
+    @Enumerated(EnumType.STRING)
     private ModalidadeEvento modalidade;
+
     private Integer capacidadeMaxima;
     private String localAcesso;
+
+    @Enumerated(EnumType.STRING)
     private StatusEvento status;
+
     private BigDecimal precoIngresso;
     private Boolean permiteEstorno;
     private BigDecimal taxaEstorno;
+
+    @ManyToOne
+    @JoinColumn(name = "evento_principal_id")
     private Evento eventoPrincipal;
+
+    @ManyToOne
+    @JoinColumn(name = "organizador_id")
     private UsuarioOrganizador usuarioOrganizador;
 
+    @OneToMany(mappedBy = "evento", cascade = CascadeType.ALL, orphanRemoval = true)
     private final List<Ingresso> ingressos = new ArrayList<>();
 
     public Evento(
@@ -66,7 +88,7 @@ public class Evento {
         validarInvariantes();
     }
 
-    public Evento() {
+    protected Evento() {
     }
 
     public String getNome() { return nome; }
@@ -242,7 +264,6 @@ public class Evento {
             }
         }
     }
-
 
     public int calcularVagasDisponiveis() {
         if (this.capacidadeMaxima == null) return Integer.MAX_VALUE;

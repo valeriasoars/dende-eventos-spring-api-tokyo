@@ -1,5 +1,10 @@
 package tokyo_spring_api.dende_eventos.mappers;
 
+import tokyo_spring_api.dende_eventos.builders.EventoBuilder;
+import tokyo_spring_api.dende_eventos.model.Evento;
+import tokyo_spring_api.dende_eventos.model.dto.request.CadastrarEventoRequestDto;
+import tokyo_spring_api.dende_eventos.model.dto.response.EventoResponseDTO;
+
 public class EventoMapper {
 
     public static Evento toModel(CadastrarEventoRequestDto dto, Evento eventoPrincipal) {

@@ -1,5 +1,9 @@
 package tokyo_spring_api.dende_eventos.mappers;
 
+import tokyo_spring_api.dende_eventos.model.Ingresso;
+import tokyo_spring_api.dende_eventos.model.dto.response.CompraIngressoResponseDTO;
+import tokyo_spring_api.dende_eventos.model.dto.response.IngressoResponseDTO;
+
 import java.util.List;
 
 public class IngressoMapper {

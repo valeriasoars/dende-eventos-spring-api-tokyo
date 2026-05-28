@@ -1,20 +1,36 @@
 package tokyo_spring_api.dende_eventos.model;
-import br.com.softhouse.dende.model.enums.StatusIngresso;
+
+import tokyo_spring_api.dende_eventos.model.enums.StatusIngresso; // IMPORT CORRIGIDO PARA O NOVO PACOTE!
+import jakarta.persistence.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
+@Entity
+@Table(name = "ingressos")
 public class Ingresso {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     private BigDecimal valorPago;
+
+    @Enumerated(EnumType.STRING)
     private StatusIngresso status;
+
     private LocalDateTime dataCompra;
+
+    @ManyToOne
+    @JoinColumn(name = "evento_id", nullable = false)
     private Evento evento;
+
+    @ManyToOne
+    @JoinColumn(name = "usuario_id", nullable = false)
     private UsuarioComum usuario;
 
-    private Ingresso() {}
+    protected Ingresso() {}
 
     private Ingresso(Evento evento, UsuarioComum usuario, BigDecimal valorPago) {
         if (evento == null) throw new IllegalArgumentException("Evento não pode ser nulo.");

@@ -1,5 +1,9 @@
 package tokyo_spring_api.dende_eventos.mappers;
 
+import tokyo_spring_api.dende_eventos.model.UsuarioComum;
+import tokyo_spring_api.dende_eventos.model.dto.request.CadastrarUsuarioComumRequestDto;
+import tokyo_spring_api.dende_eventos.model.dto.response.PerfilComumResponseDTO;
+
 public class UsuarioComumMapper {
 
     public static UsuarioComum toModel(CadastrarUsuarioComumRequestDto dto) {
