@@ -277,6 +277,30 @@ public class Evento {
         this.status = statusPersistido;
     }
 
+    public static Evento parcialParaAlterar(
+            String nome, String descricao, String paginaEvento,
+            LocalDateTime dataInicio, LocalDateTime dataFinal,
+            TipoEvento tipo, ModalidadeEvento modalidade,
+            Integer capacidadeMaxima, String localAcesso,
+            BigDecimal precoIngresso, Boolean permiteEstorno,
+            BigDecimal taxaEstorno, Evento eventoPrincipal) {
+        Evento e = new Evento();
+        e.nome = nome;
+        e.descricao = descricao;
+        e.paginaEvento = paginaEvento;
+        e.dataInicio = dataInicio;
+        e.dataFinal = dataFinal;
+        e.tipo = tipo;
+        e.modalidade = modalidade;
+        e.capacidadeMaxima = capacidadeMaxima;
+        e.localAcesso = localAcesso;
+        e.precoIngresso = precoIngresso;
+        e.permiteEstorno = permiteEstorno;
+        e.taxaEstorno = taxaEstorno;
+        e.eventoPrincipal = eventoPrincipal;
+        return e;
+    }
+
     public boolean estaAtivo() {
         return this.status == StatusEvento.ATIVO;
     }

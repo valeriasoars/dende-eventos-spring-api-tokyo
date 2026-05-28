@@ -1,4 +1,4 @@
-package br.com.softhouse.dende.exceptions;
+package tokyo_spring_api.dende_eventos.exceptions;
 
 public class EmailJaCadastradoException extends RuntimeException {
 
