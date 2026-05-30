@@ -1,5 +1,6 @@
 package tokyo_spring_api.dende_eventos.services;
 
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 import tokyo_spring_api.dende_eventos.exceptions.EmailJaCadastradoException;
 import tokyo_spring_api.dende_eventos.exceptions.UsuarioNaoEncontradoException;
@@ -35,6 +36,7 @@ public class UsuarioComumService {
         return UsuarioComumMapper.toResponse(usuario);
     }
 
+    @Transactional
     public String alterar(String email, AlterarPerfilComumDTO dto) {
         UsuarioComum usuario = buscarUsuarioComum(email);
         usuario.alterarPerfil(dto);
@@ -42,6 +44,7 @@ public class UsuarioComumService {
         return "Perfil de " + email + " atualizado com sucesso.";
     }
 
+    @Transactional
     public String desativar(String email) {
         UsuarioComum usuario = buscarUsuarioComum(email);
         usuario.desativarUsuario();
@@ -49,6 +52,7 @@ public class UsuarioComumService {
         return "Usuario desativado com sucesso.";
     }
 
+    @Transactional
     public String reativar(String email, ReativarUsuarioDTO dto) {
         UsuarioComum usuario = buscarUsuarioComum(email);
         String senha = (dto != null) ? dto.senha() : null;

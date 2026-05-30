@@ -1,5 +1,6 @@
 package tokyo_spring_api.dende_eventos.services;
 
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 import tokyo_spring_api.dende_eventos.exceptions.EmailJaCadastradoException;
 import tokyo_spring_api.dende_eventos.exceptions.EventoNaoEncontradoException;
@@ -49,6 +50,7 @@ public class UsuarioOrganizadorService {
         return UsuarioOrganizadorMapper.toResponse(organizador);
     }
 
+    @Transactional
     public String alterar(String email, AlterarPerfilOrganizadorDTO dto) {
         UsuarioOrganizador organizador = buscarOrganizador(email);
         organizador.alterarPerfil(dto);
@@ -56,6 +58,7 @@ public class UsuarioOrganizadorService {
         return "Perfil de " + email + " atualizado com sucesso.";
     }
 
+    @Transactional
     public String desativar(String email) {
         UsuarioOrganizador organizador = buscarOrganizador(email);
         if (!organizador.isAtivo()) {
@@ -66,6 +69,7 @@ public class UsuarioOrganizadorService {
         return "Organizador desativado com sucesso.";
     }
 
+    @Transactional
     public String reativar(String email, ReativarUsuarioDTO dto) {
         UsuarioOrganizador organizador = buscarOrganizador(email);
         if (organizador.isAtivo()) {
@@ -77,6 +81,8 @@ public class UsuarioOrganizadorService {
         return "Organizador reativado com sucesso.";
     }
 
+
+    @Transactional
     public String cadastrarEvento(String email, CadastrarEventoRequestDto dto) {
         UsuarioOrganizador organizador = buscarOrganizador(email);
         if (!organizador.isAtivo()) {
@@ -95,12 +101,13 @@ public class UsuarioOrganizadorService {
         return "Evento '" + evento.getNome() + "' cadastrado com sucesso.";
     }
 
+    @Transactional
     public String alterarEvento(String email, Long eventoId, AlterarEventoRequestDto dto) {
         buscarOrganizador(email);
         Evento evento = eventoRepository.findById(eventoId)
                 .orElseThrow(() -> new EventoNaoEncontradoException(eventoId));
 
-        if (!evento.getOrganizador().getEmail().equals(email)) {
+        if (!evento.getUsuarioOrganizador().getEmail().equals(email)) {
             throw new OperacaoNaoPermitidaException("Voce nao tem permissao para alterar este evento.");
         }
 
@@ -124,21 +131,32 @@ public class UsuarioOrganizadorService {
         return "Evento alterado com sucesso.";
     }
 
-    public List<EventoOrganizadorResponseDTO> listarEventos(String email) {
+    // Ordenação feita pelo banco no repository — sem .sorted() aqui
+    /*public List<EventoOrganizadorResponseDTO> listarEventos(String email) {
         buscarOrganizador(email);
         return eventoRepository.findByUsuarioOrganizadorEmail(email).stream()
                 .sorted(Comparator.comparing(Evento::getDataInicio)
                         .thenComparing(Evento::getNome, String.CASE_INSENSITIVE_ORDER))
                 .map(UsuarioOrganizadorMapper::toListarEventoOrganizadorDTO)
                 .collect(Collectors.toList());
+    }*/
+
+    public List<EventoOrganizadorResponseDTO> listarEventos(String email) {
+        buscarOrganizador(email);
+        return eventoRepository.findByUsuarioOrganizadorEmail(email)
+                .stream()
+                .map(UsuarioOrganizadorMapper::toListarEventoOrganizadorDTO)
+                .toList();
     }
 
+
+    @Transactional
     public String alterarStatusEvento(String email, Long eventoId, String status) {
         buscarOrganizador(email);
         Evento evento = eventoRepository.findById(eventoId)
                 .orElseThrow(() -> new EventoNaoEncontradoException(eventoId));
 
-        if (!evento.getOrganizador().getEmail().equals(email)) {
+        if (!evento.getUsuarioOrganizador().getEmail().equals(email)) {
             throw new OperacaoNaoPermitidaException("Voce nao tem permissao para alterar este evento.");
         }
 

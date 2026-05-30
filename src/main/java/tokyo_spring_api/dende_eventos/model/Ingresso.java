@@ -1,5 +1,8 @@
 package tokyo_spring_api.dende_eventos.model;
 
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import tokyo_spring_api.dende_eventos.model.enums.StatusIngresso; // IMPORT CORRIGIDO PARA O NOVO PACOTE!
 import jakarta.persistence.*;
 
@@ -7,6 +10,8 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 @Table(name = "ingressos")
 public class Ingresso {
@@ -30,8 +35,6 @@ public class Ingresso {
     @JoinColumn(name = "usuario_id", nullable = false)
     private UsuarioComum usuario;
 
-    protected Ingresso() {}
-
     private Ingresso(Evento evento, UsuarioComum usuario, BigDecimal valorPago) {
         if (evento == null) throw new IllegalArgumentException("Evento não pode ser nulo.");
         if (usuario == null) throw new IllegalArgumentException("Usuário não pode ser nulo.");
@@ -48,16 +51,9 @@ public class Ingresso {
         return new Ingresso(evento, usuario, valorPago);
     }
 
-    public Evento getEvento() { return this.evento; }
-    public UsuarioComum getUsuario() { return this.usuario; }
-    public BigDecimal getValorPago() { return this.valorPago; }
-    public StatusIngresso getStatus() { return this.status; }
-    public LocalDateTime getDataCompra() { return this.dataCompra; }
-    public Long getId() { return this.id; }
-    public void setId(Long id) { this.id = id; }
 
     public BigDecimal cancelarIngresso() {
-        if (!evento.isPermiteEstorno())
+        if (!Boolean.TRUE.equals(evento.getPermiteEstorno()))
             throw new IllegalStateException("Evento não permite estorno.");
         if (this.status != StatusIngresso.ATIVO)
             throw new IllegalStateException("Ingresso já está cancelado.");

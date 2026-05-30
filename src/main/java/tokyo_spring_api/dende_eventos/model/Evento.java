@@ -1,5 +1,8 @@
 package tokyo_spring_api.dende_eventos.model;
 
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import tokyo_spring_api.dende_eventos.model.enums.ModalidadeEvento;
 import tokyo_spring_api.dende_eventos.model.enums.StatusEvento;
 import tokyo_spring_api.dende_eventos.model.enums.StatusIngresso;
@@ -14,6 +17,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 @Table(name = "eventos")
 public class Evento {
@@ -56,19 +61,19 @@ public class Evento {
     private final List<Ingresso> ingressos = new ArrayList<>();
 
     public Evento(
-            final String nome,
-            final String descricao,
-            final String paginaEvento,
-            final LocalDateTime dataInicio,
-            final LocalDateTime dataFinal,
-            final TipoEvento tipo,
-            final ModalidadeEvento modalidade,
-            final Integer capacidadeMaxima,
-            final String localAcesso,
-            final BigDecimal precoIngresso,
-            final Boolean permiteEstorno,
-            final BigDecimal taxaEstorno,
-            final Evento eventoPrincipal
+            String nome,
+            String descricao,
+            String paginaEvento,
+            LocalDateTime dataInicio,
+            LocalDateTime dataFinal,
+            TipoEvento tipo,
+            ModalidadeEvento modalidade,
+            Integer capacidadeMaxima,
+            String localAcesso,
+            BigDecimal precoIngresso,
+            Boolean permiteEstorno,
+            BigDecimal taxaEstorno,
+            Evento eventoPrincipal
     ) {
         this.nome = nome;
         this.descricao = descricao;
@@ -88,30 +93,15 @@ public class Evento {
         validarInvariantes();
     }
 
-    protected Evento() {
+    public List<Ingresso> getIngressos() {
+        return Collections.unmodifiableList(ingressos);
     }
 
-    public String getNome() { return nome; }
-    public String getDescricao() { return descricao; }
-    public long getId() { return id; }
-    public String getPaginaEvento() { return paginaEvento; }
-    public LocalDateTime getDataInicio() { return dataInicio; }
-    public LocalDateTime getDataFinal() { return dataFinal; }
-    public TipoEvento getTipo() { return tipo; }
-    public ModalidadeEvento getModalidade() { return modalidade; }
-    public Integer getCapacidadeMaxima() { return capacidadeMaxima; }
-    public String getLocalAcesso() { return localAcesso; }
-    public StatusEvento getStatus() { return status; }
-    public BigDecimal getPrecoIngresso() { return precoIngresso; }
-    public Boolean isPermiteEstorno() { return permiteEstorno; }
-    public BigDecimal getTaxaEstorno() { return taxaEstorno; }
-    public Evento getEventoPrincipal() { return eventoPrincipal; }
-    public UsuarioOrganizador getOrganizador() { return usuarioOrganizador; }
-    public List<Ingresso> getIngressos() { return Collections.unmodifiableList(ingressos); }
 
-    public void atribuirId(final long id) {
-        if (this.id == 0) this.id = id;
-    }
+
+    // -------------------------------------------------------------------------
+    // Validações internas de domínio
+    // -------------------------------------------------------------------------
 
     private void validarDatas(LocalDateTime dataInicio, LocalDateTime dataFinal) {
         if (dataInicio == null || dataFinal == null)
@@ -162,7 +152,7 @@ public class Evento {
     }
 
 
-    public List<Ingresso> processarCompraIngresso(UsuarioComum usuario) {
+    /*public List<Ingresso> processarCompraIngresso(UsuarioComum usuario) {
         validarDisponibilidade();
 
         if (this.eventoPrincipal != null) {
@@ -180,7 +170,18 @@ public class Evento {
         Ingresso ingresso = Ingresso.criar(this, usuario, this.precoIngresso);
         this.adicionarIngresso(ingresso);
         return List.of(ingresso);
+    }*/
+
+    public void validarDisponibilidadeParaCompra(int vagasContadasNoRepository) {
+        if (this.status != StatusEvento.ATIVO)
+            throw new IllegalStateException("Evento não está ativo. Status atual: " + this.status);
+        if (this.capacidadeMaxima != null && vagasContadasNoRepository >= this.capacidadeMaxima)
+            throw new IllegalStateException("Evento sem vagas disponíveis.");
     }
+
+    // -------------------------------------------------------------------------
+    // Operações de domínio
+    // -------------------------------------------------------------------------
 
 
     public void atribuirOrganizador(UsuarioOrganizador usuarioOrganizador) {
@@ -195,7 +196,7 @@ public class Evento {
 
         LocalDateTime novoHorarioInicio = (novosDados.getDataInicio() != null) ? novosDados.getDataInicio() : this.dataInicio;
         LocalDateTime novoHorarioFim = (novosDados.getDataFinal() != null) ? novosDados.getDataFinal() : this.dataFinal;
-        Boolean novoPermiteEstorno = (novosDados.isPermiteEstorno() != null) ? novosDados.isPermiteEstorno() : this.permiteEstorno;
+        Boolean novoPermiteEstorno = (novosDados.getPermiteEstorno() != null) ? novosDados.getPermiteEstorno() : this.permiteEstorno;
         BigDecimal novaTaxaEstorno = (novosDados.getTaxaEstorno() != null) ? novosDados.getTaxaEstorno() : this.taxaEstorno;
 
         validarDatas(novoHorarioInicio, novoHorarioFim);
@@ -273,8 +274,24 @@ public class Evento {
         return this.capacidadeMaxima - (int) ativos;
     }
 
-    public void restaurarStatus(StatusEvento statusPersistido) {
+    public boolean estaAtivo() {
+        return this.status == StatusEvento.ATIVO;
+    }
+
+    /*public void restaurarStatus(StatusEvento statusPersistido) {
         this.status = statusPersistido;
+    }*/
+
+
+    public BigDecimal calcularValorEstorno(Ingresso ingresso) {
+        if (permiteEstorno == null || !permiteEstorno)
+            return BigDecimal.ZERO;
+        if (taxaEstorno == null || taxaEstorno.compareTo(BigDecimal.ZERO) == 0)
+            return ingresso.getValorPago();
+        BigDecimal fator = BigDecimal.ONE.subtract(
+                taxaEstorno.divide(BigDecimal.valueOf(100), 10, RoundingMode.HALF_UP)
+        );
+        return ingresso.getValorPago().multiply(fator).setScale(2, RoundingMode.HALF_UP);
     }
 
     public static Evento parcialParaAlterar(
@@ -301,18 +318,5 @@ public class Evento {
         return e;
     }
 
-    public boolean estaAtivo() {
-        return this.status == StatusEvento.ATIVO;
-    }
 
-    public BigDecimal calcularValorEstorno(Ingresso ingresso) {
-        if (permiteEstorno == null || !permiteEstorno)
-            return BigDecimal.ZERO;
-        if (taxaEstorno == null || taxaEstorno.compareTo(BigDecimal.ZERO) == 0)
-            return ingresso.getValorPago();
-        BigDecimal fator = BigDecimal.ONE.subtract(
-                taxaEstorno.divide(BigDecimal.valueOf(100), 10, RoundingMode.HALF_UP)
-        );
-        return ingresso.getValorPago().multiply(fator).setScale(2, RoundingMode.HALF_UP);
-    }
 }

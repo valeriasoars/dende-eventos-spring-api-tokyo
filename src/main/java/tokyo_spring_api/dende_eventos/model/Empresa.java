@@ -1,20 +1,27 @@
 package tokyo_spring_api.dende_eventos.model;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 @Table(name = "empresas")
 public class Empresa {
 
     @Id
+    @Column(nullable = false, unique = true, length = 18)
     private String cnpj;
 
+    @Column(nullable = false)
     private String razaoSocial;
+    @Column(nullable = false)
     private String nomeFantasia;
-
-    protected Empresa() {}
 
     public Empresa(String cnpj, String razaoSocial, String nomeFantasia) {
         if (cnpj == null || cnpj.isBlank())
@@ -27,8 +34,4 @@ public class Empresa {
         this.razaoSocial = razaoSocial;
         this.nomeFantasia = nomeFantasia;
     }
-
-    public String getCnpj() { return cnpj; }
-    public String getRazaoSocial() { return razaoSocial; }
-    public String getNomeFantasia() { return nomeFantasia; }
 }

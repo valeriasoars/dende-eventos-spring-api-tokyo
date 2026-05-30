@@ -2,6 +2,7 @@ package tokyo_spring_api.dende_eventos.repositories;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import tokyo_spring_api.dende_eventos.model.Evento;
 import tokyo_spring_api.dende_eventos.model.enums.ModalidadeEvento;
@@ -13,6 +14,11 @@ import java.util.List;
 @Repository
 public interface EventoRepository extends JpaRepository<Evento, Long> {
 
+    @Query("""
+            SELECT e FROM Evento e
+            WHERE e.usuarioOrganizador.email = :email
+            ORDER BY e.dataInicio ASC, LOWER(e.nome) ASC
+            """)
     List<Evento> findByUsuarioOrganizadorEmail(String email);
 
     List<Evento> findByStatus(StatusEvento status);
@@ -30,5 +36,7 @@ public interface EventoRepository extends JpaRepository<Evento, Long> {
             AND (:nome IS NULL OR LOWER(e.nome) LIKE LOWER(CONCAT('%', :nome, '%')))
             ORDER BY e.dataInicio ASC
             """)
-    List<Evento> findFeedPublico(TipoEvento tipo, ModalidadeEvento modalidade, String nome);
+    List<Evento> findFeedPublico( @Param("tipo") TipoEvento tipo,
+                                  @Param("modalidade") ModalidadeEvento modalidade,
+                                  @Param("nome") String nome);
 }

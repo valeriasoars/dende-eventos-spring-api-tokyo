@@ -1,11 +1,17 @@
 package tokyo_spring_api.dende_eventos.model;
 
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import tokyo_spring_api.dende_eventos.model.enums.Sexo;
 import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.time.Period;
 import java.util.Objects;
 
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 @Table(name = "usuarios")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
@@ -16,21 +22,27 @@ public abstract class Usuario {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Setter
     @Column(unique = true, nullable = false)
     private String email;
 
+    @Setter
+    @Column(nullable = false)
     private String nome;
+
+    @Setter
     private LocalDate dataNascimento;
 
+    @Setter
     @Enumerated(EnumType.STRING)
     private Sexo sexo;
 
+    @Setter
+    @Column(nullable = false)
     private String senha;
-    private Boolean ativo;
 
-    protected Usuario() {
-        this.ativo = true;
-    }
+    @Column(nullable = false)
+    private Boolean ativo;
 
     public Usuario(String nome, LocalDate dataNascimento, Sexo sexo, String email, String senha) {
         if (nome == null || nome.isBlank())
@@ -61,7 +73,7 @@ public abstract class Usuario {
     }
 
     public void desativarUsuario() {
-        if (!this.ativo) throw new IllegalStateException("Usuario ja esta inativo.");
+        if (Boolean.TRUE.equals(this.ativo)) throw new IllegalStateException("Usuario ja esta inativo.");
         this.ativo = false;
     }
 
@@ -83,18 +95,6 @@ public abstract class Usuario {
         return Boolean.TRUE.equals(ativo);
     }
 
-    public String getNome() { return nome; }
-    public void setNome(String nome) { this.nome = nome; }
-    public void setDataNascimento(LocalDate dataNascimento) { this.dataNascimento = dataNascimento; }
-    public LocalDate getDataNascimento() {return dataNascimento;}
-    public Sexo getSexo() {return sexo;}
-    public void setSexo(Sexo sexo) { this.sexo = sexo; }
-    public String getEmail() { return email; }
-    public void setSenha(String senha) { this.senha = senha; }
-    public String getSenha() {return senha;}
-    protected void setEmail(String email) {
-        this.email = email;
-    }
 
     @Override
     public boolean equals(Object object) {

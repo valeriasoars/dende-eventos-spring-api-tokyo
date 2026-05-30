@@ -1,5 +1,6 @@
 package tokyo_spring_api.dende_eventos.services;
 
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 import tokyo_spring_api.dende_eventos.exceptions.CapacidadeExcedidaException;
 import tokyo_spring_api.dende_eventos.exceptions.EventoNaoEncontradoException;
@@ -20,6 +21,7 @@ import tokyo_spring_api.dende_eventos.repositories.IngressoRepository;
 import tokyo_spring_api.dende_eventos.repositories.UsuarioRepository;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -43,6 +45,8 @@ public class IngressoService {
         return IngressoMapper.toResponse(ingresso);
     }
 
+
+    @Transactional
     public CompraIngressoResponseDTO comprar(String email, Long eventoId) {
         Usuario usuario = usuarioRepository.findByEmail(email)
                 .orElseThrow(() -> new UsuarioNaoEncontradoException(email));
@@ -53,18 +57,21 @@ public class IngressoService {
         Evento evento = eventoRepository.findById(eventoId)
                 .orElseThrow(() -> new EventoNaoEncontradoException(eventoId));
 
-        if (evento.getStatus() != StatusEvento.ATIVO) {
-            throw new OperacaoNaoPermitidaException("Evento não está ativo. Status atual: " + evento.getStatus());
+        int vagasOcupadas = ingressoRepository.countByEventoIdAndStatus(eventoId, StatusIngresso.ATIVO);
+        evento.validarDisponibilidadeParaCompra(vagasOcupadas);
+        List<Ingresso> ingressos = new ArrayList<>();
+
+        if (evento.getEventoPrincipal() != null) {
+            Evento eventoPrincipal = evento.getEventoPrincipal();
+            int vagasPrincipal = ingressoRepository.countByEventoIdAndStatus(eventoPrincipal.getId(), StatusIngresso.ATIVO);
+            eventoPrincipal.validarDisponibilidadeParaCompra(vagasPrincipal);
+
+            ingressos.add(Ingresso.criar(evento, usuarioComum, evento.getPrecoIngresso()));
+            ingressos.add(Ingresso.criar(eventoPrincipal, usuarioComum, eventoPrincipal.getPrecoIngresso()));
+        } else {
+            ingressos.add(Ingresso.criar(evento, usuarioComum, evento.getPrecoIngresso()));
         }
 
-        if (evento.getCapacidadeMaxima() != null) {
-            int ativos = ingressoRepository.countByEventoIdAndStatus(eventoId, StatusIngresso.ATIVO);
-            if (ativos >= evento.getCapacidadeMaxima()) {
-                throw new CapacidadeExcedidaException(eventoId);
-            }
-        }
-
-        List<Ingresso> ingressos = usuarioComum.solicitarIngresso(evento);
         ingressoRepository.saveAll(ingressos);
         return IngressoMapper.toCompraResponse(ingressos);
     }
