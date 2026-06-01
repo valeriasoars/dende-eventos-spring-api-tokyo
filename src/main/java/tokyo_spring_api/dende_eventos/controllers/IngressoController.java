@@ -2,7 +2,6 @@ package tokyo_spring_api.dende_eventos.controllers;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import tokyo_spring_api.dende_eventos.exceptions.*;
 import tokyo_spring_api.dende_eventos.model.dto.response.CompraIngressoResponseDTO;
 import tokyo_spring_api.dende_eventos.model.dto.response.IngressoResponseDTO;
 import tokyo_spring_api.dende_eventos.services.IngressoService;
@@ -12,6 +11,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/ingressos")
 public class IngressoController {
+
     private final IngressoService ingressoService;
 
     public IngressoController(IngressoService ingressoService) {
@@ -19,51 +19,26 @@ public class IngressoController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> buscarPorId(@PathVariable Long id) {
-        try {
-            return ResponseEntity.ok(ingressoService.buscarPorId(id));
-        } catch (IngressoNaoEncontradoException e) {
-            return ResponseEntity.status(404).body(e.getMessage());
-        }
+    public ResponseEntity<IngressoResponseDTO> buscarPorId(@PathVariable Long id) {
+        return ResponseEntity.ok(ingressoService.buscarPorId(id));
     }
 
     @PostMapping("/usuario/{email}/evento/{eventoId}")
-    public ResponseEntity<?> comprar(
+    public ResponseEntity<CompraIngressoResponseDTO> comprar(
             @PathVariable String email,
             @PathVariable Long eventoId) {
-        try {
-            CompraIngressoResponseDTO response = ingressoService.comprar(email, eventoId);
-            return ResponseEntity.ok(response);
-        } catch (UsuarioNaoEncontradoException | EventoNaoEncontradoException e) {
-            return ResponseEntity.status(404).body(e.getMessage());
-        } catch (OperacaoNaoPermitidaException | CapacidadeExcedidaException |
-                 IllegalArgumentException | IllegalStateException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+        return ResponseEntity.ok(ingressoService.comprar(email, eventoId));
     }
 
     @GetMapping("/usuario/{email}")
-    public ResponseEntity<?> listarPorUsuario(@PathVariable String email) {
-        try {
-            List<IngressoResponseDTO> lista = ingressoService.listarPorUsuario(email);
-            return ResponseEntity.ok(lista);
-        } catch (UsuarioNaoEncontradoException e) {
-            return ResponseEntity.status(404).body(e.getMessage());
-        } catch (OperacaoNaoPermitidaException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+    public ResponseEntity<List<IngressoResponseDTO>> listarPorUsuario(@PathVariable String email) {
+        return ResponseEntity.ok(ingressoService.listarPorUsuario(email));
     }
 
     @PatchMapping("/{id}/cancelar")
-    public ResponseEntity<?> cancelar(
+    public ResponseEntity<String> cancelar(
             @PathVariable Long id,
             @RequestParam String email) {
-        try {
-            return ResponseEntity.ok(ingressoService.cancelar(email, id));
-        } catch (IngressoNaoEncontradoException e) {
-            return ResponseEntity.status(404).body(e.getMessage());
-        } catch (OperacaoNaoPermitidaException | IllegalStateException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+        return ResponseEntity.ok(ingressoService.cancelar(email, id));
     }
 }

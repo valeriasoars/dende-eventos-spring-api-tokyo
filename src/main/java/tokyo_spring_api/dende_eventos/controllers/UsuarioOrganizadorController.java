@@ -3,10 +3,6 @@ package tokyo_spring_api.dende_eventos.controllers;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import tokyo_spring_api.dende_eventos.exceptions.EmailJaCadastradoException;
-import tokyo_spring_api.dende_eventos.exceptions.EventoNaoEncontradoException;
-import tokyo_spring_api.dende_eventos.exceptions.OperacaoNaoPermitidaException;
-import tokyo_spring_api.dende_eventos.exceptions.UsuarioNaoEncontradoException;
 import tokyo_spring_api.dende_eventos.model.dto.AlterarPerfilOrganizadorDTO;
 import tokyo_spring_api.dende_eventos.model.dto.ReativarUsuarioDTO;
 import tokyo_spring_api.dende_eventos.model.dto.request.AlterarEventoRequestDto;
@@ -21,6 +17,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/organizadores")
 public class UsuarioOrganizadorController {
+
     private final UsuarioOrganizadorService organizadorService;
 
     public UsuarioOrganizadorController(UsuarioOrganizadorService organizadorService) {
@@ -28,111 +25,59 @@ public class UsuarioOrganizadorController {
     }
 
     @PostMapping
-    public ResponseEntity<?> cadastrar(@RequestBody CadastrarUsuarioOrganizadorRequestDto dto) {
-        try {
-            return ResponseEntity.status(HttpStatus.CREATED).body(organizadorService.cadastrar(dto));
-        } catch (EmailJaCadastradoException e) {
-            return ResponseEntity.status(409).body(e.getMessage());
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+    public ResponseEntity<String> cadastrar(@RequestBody CadastrarUsuarioOrganizadorRequestDto dto) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(organizadorService.cadastrar(dto));
     }
 
     @GetMapping("/{email}")
-    public ResponseEntity<?> buscarPerfil(@PathVariable String email) {
-        try {
-            PerfilOrganizadorResponseDTO perfil = organizadorService.buscarPerfil(email);
-            return ResponseEntity.ok(perfil);
-        } catch (UsuarioNaoEncontradoException e) {
-            return ResponseEntity.status(404).body(e.getMessage());
-        }
+    public ResponseEntity<PerfilOrganizadorResponseDTO> buscarPerfil(@PathVariable String email) {
+        return ResponseEntity.ok(organizadorService.buscarPerfil(email));
     }
 
     @PutMapping("/{email}")
-    public ResponseEntity<?> alterar(
+    public ResponseEntity<String> alterar(
             @PathVariable String email,
             @RequestBody AlterarPerfilOrganizadorDTO dto) {
-        try {
-            return ResponseEntity.ok(organizadorService.alterar(email, dto));
-        } catch (UsuarioNaoEncontradoException e) {
-            return ResponseEntity.status(404).body(e.getMessage());
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+        return ResponseEntity.ok(organizadorService.alterar(email, dto));
     }
 
     @PatchMapping("/{email}/desativar")
-    public ResponseEntity<?> desativar(@PathVariable String email) {
-        try {
-            return ResponseEntity.ok(organizadorService.desativar(email));
-        } catch (UsuarioNaoEncontradoException e) {
-            return ResponseEntity.status(404).body(e.getMessage());
-        } catch (OperacaoNaoPermitidaException | IllegalStateException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+    public ResponseEntity<String> desativar(@PathVariable String email) {
+        return ResponseEntity.ok(organizadorService.desativar(email));
     }
 
     @PatchMapping("/{email}/reativar")
-    public ResponseEntity<?> reativar(
+    public ResponseEntity<String> reativar(
             @PathVariable String email,
             @RequestBody(required = false) ReativarUsuarioDTO dto) {
-        try {
-            return ResponseEntity.ok(organizadorService.reativar(email, dto));
-        } catch (UsuarioNaoEncontradoException e) {
-            return ResponseEntity.status(404).body(e.getMessage());
-        } catch (OperacaoNaoPermitidaException | IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+        return ResponseEntity.ok(organizadorService.reativar(email, dto));
     }
 
     @PostMapping("/{email}/eventos")
-    public ResponseEntity<?> cadastrarEvento(
+    public ResponseEntity<String> cadastrarEvento(
             @PathVariable String email,
             @RequestBody CadastrarEventoRequestDto dto) {
-        try {
-            return ResponseEntity.status(HttpStatus.CREATED).body(organizadorService.cadastrarEvento(email, dto));
-        } catch (UsuarioNaoEncontradoException | EventoNaoEncontradoException e) {
-            return ResponseEntity.status(404).body(e.getMessage());
-        } catch (OperacaoNaoPermitidaException | IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+        return ResponseEntity.status(HttpStatus.CREATED).body(organizadorService.cadastrarEvento(email, dto));
     }
 
     @PutMapping("/{email}/eventos/{eventoId}")
-    public ResponseEntity<?> alterarEvento(
+    public ResponseEntity<String> alterarEvento(
             @PathVariable String email,
             @PathVariable Long eventoId,
             @RequestBody AlterarEventoRequestDto dto) {
-        try {
-            return ResponseEntity.ok(organizadorService.alterarEvento(email, eventoId, dto));
-        } catch (UsuarioNaoEncontradoException | EventoNaoEncontradoException e) {
-            return ResponseEntity.status(404).body(e.getMessage());
-        } catch (OperacaoNaoPermitidaException | IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+        return ResponseEntity.ok(organizadorService.alterarEvento(email, eventoId, dto));
     }
 
     @GetMapping("/{email}/eventos")
-    public ResponseEntity<?> listarEventos(@PathVariable String email) {
-        try {
-            List<EventoOrganizadorResponseDTO> lista = organizadorService.listarEventos(email);
-            return ResponseEntity.ok(lista);
-        } catch (UsuarioNaoEncontradoException e) {
-            return ResponseEntity.status(404).body(e.getMessage());
-        }
+    public ResponseEntity<List<EventoOrganizadorResponseDTO>> listarEventos(@PathVariable String email) {
+        return ResponseEntity.ok(organizadorService.listarEventos(email));
     }
 
     @PatchMapping("/{email}/eventos/{eventoId}/status")
-    public ResponseEntity<?> alterarStatus(
+    public ResponseEntity<String> alterarStatus(
             @PathVariable String email,
             @PathVariable Long eventoId,
             @RequestParam String acao) {
-        try {
-            return ResponseEntity.ok(organizadorService.alterarStatusEvento(email, eventoId, acao));
-        } catch (UsuarioNaoEncontradoException | EventoNaoEncontradoException e) {
-            return ResponseEntity.status(404).body(e.getMessage());
-        } catch (OperacaoNaoPermitidaException | IllegalStateException | IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+        return ResponseEntity.ok(organizadorService.alterarStatusEvento(email, eventoId, acao));
     }
 }

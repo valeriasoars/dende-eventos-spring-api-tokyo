@@ -15,6 +15,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/eventos")
 public class EventoController {
+
     private final EventoService eventoService;
 
     public EventoController(EventoService eventoService) {
@@ -22,15 +23,10 @@ public class EventoController {
     }
 
     @GetMapping
-    public ResponseEntity<?> feedEventos(
+    public ResponseEntity<List<EventoResponseDTO>> feedEventos(
             @RequestParam(required = false) TipoEvento tipo,
             @RequestParam(required = false) ModalidadeEvento modalidade,
             @RequestParam(required = false) String nome) {
-        try {
-            List<EventoResponseDTO> lista = eventoService.feedPublico(tipo, modalidade, nome);
-            return ResponseEntity.ok(lista);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+        return ResponseEntity.ok(eventoService.feedPublico(tipo, modalidade, nome));
     }
 }

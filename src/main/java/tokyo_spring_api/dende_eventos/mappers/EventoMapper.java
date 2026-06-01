@@ -26,8 +26,7 @@ public class EventoMapper {
     }
 
     public static EventoResponseDTO toResponse(Evento evento){
-        String nomeOrganizador = (evento.getOrganizador() != null) ? evento.getOrganizador().getNome() : null;
-        return new EventoResponseDTO(
+        String nomeOrganizador = (evento.getUsuarioOrganizador() != null) ? evento.getUsuarioOrganizador().getNome() : null;        return new EventoResponseDTO(
                 evento.getNome(),
                 evento.getDescricao(),
                 evento.getDataInicio(),
