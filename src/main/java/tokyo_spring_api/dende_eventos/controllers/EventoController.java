@@ -33,6 +33,6 @@ public class EventoController {
             @RequestParam(required = false) TipoEvento tipo,
             @RequestParam(required = false) ModalidadeEvento modalidade,
             @RequestParam(required = false) String nome) {
-        return ResponseEntity.ok(eventoService.feedPublico(tipo, modalidade, nome)); // Consome perfeitamente o método do Ian
+        return ResponseEntity.ok(eventoService.feedPublico(tipo, modalidade, nome));
     }
 }

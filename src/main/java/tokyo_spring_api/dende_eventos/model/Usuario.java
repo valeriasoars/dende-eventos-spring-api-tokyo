@@ -73,7 +73,7 @@ public abstract class Usuario {
     }
 
     public void desativarUsuario() {
-        if (Boolean.TRUE.equals(this.ativo)) throw new IllegalStateException("Usuario ja esta inativo.");
+        if (!Boolean.TRUE.equals(this.ativo)) throw new IllegalStateException("Usuario ja esta inativo.");
         this.ativo = false;
     }
 
