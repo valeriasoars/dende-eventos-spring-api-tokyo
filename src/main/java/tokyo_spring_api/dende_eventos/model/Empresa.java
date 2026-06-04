@@ -20,6 +20,7 @@ public class Empresa {
 
     @Column(nullable = false)
     private String razaoSocial;
+
     @Column(nullable = false)
     private String nomeFantasia;
 

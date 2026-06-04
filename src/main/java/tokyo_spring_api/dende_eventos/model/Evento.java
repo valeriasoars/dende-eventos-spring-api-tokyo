@@ -98,11 +98,6 @@ public class Evento {
     }
 
 
-
-    // -------------------------------------------------------------------------
-    // Validações internas de domínio
-    // -------------------------------------------------------------------------
-
     private void validarDatas(LocalDateTime dataInicio, LocalDateTime dataFinal) {
         if (dataInicio == null || dataFinal == null)
             throw new IllegalArgumentException("Datas e Horários não podem ser nulos.");
@@ -152,37 +147,12 @@ public class Evento {
     }
 
 
-    /*public List<Ingresso> processarCompraIngresso(UsuarioComum usuario) {
-        validarDisponibilidade();
-
-        if (this.eventoPrincipal != null) {
-            eventoPrincipal.validarDisponibilidade();
-
-            Ingresso ingressoSub = Ingresso.criar(this, usuario, this.precoIngresso);
-            Ingresso ingressoPrincipal = Ingresso.criar(eventoPrincipal, usuario, eventoPrincipal.getPrecoIngresso());
-
-            this.adicionarIngresso(ingressoSub);
-            eventoPrincipal.adicionarIngresso(ingressoPrincipal);
-
-            return List.of(ingressoSub, ingressoPrincipal);
-        }
-
-        Ingresso ingresso = Ingresso.criar(this, usuario, this.precoIngresso);
-        this.adicionarIngresso(ingresso);
-        return List.of(ingresso);
-    }*/
-
     public void validarDisponibilidadeParaCompra(int vagasContadasNoRepository) {
         if (this.status != StatusEvento.ATIVO)
             throw new IllegalStateException("Evento não está ativo. Status atual: " + this.status);
         if (this.capacidadeMaxima != null && vagasContadasNoRepository >= this.capacidadeMaxima)
             throw new IllegalStateException("Evento sem vagas disponíveis.");
     }
-
-    // -------------------------------------------------------------------------
-    // Operações de domínio
-    // -------------------------------------------------------------------------
-
 
     public void atribuirOrganizador(UsuarioOrganizador usuarioOrganizador) {
         if (this.usuarioOrganizador != null)
@@ -274,15 +244,6 @@ public class Evento {
         return this.capacidadeMaxima - (int) ativos;
     }
 
-    public boolean estaAtivo() {
-        return this.status == StatusEvento.ATIVO;
-    }
-
-    /*public void restaurarStatus(StatusEvento statusPersistido) {
-        this.status = statusPersistido;
-    }*/
-
-
     public BigDecimal calcularValorEstorno(Ingresso ingresso) {
         if (permiteEstorno == null || !permiteEstorno)
             return BigDecimal.ZERO;
@@ -317,6 +278,5 @@ public class Evento {
         e.eventoPrincipal = eventoPrincipal;
         return e;
     }
-
 
 }

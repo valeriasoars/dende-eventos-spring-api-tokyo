@@ -65,10 +65,6 @@ public class UsuarioOrganizador extends Usuario {
     }
 
 
-    public List<Evento> getEventos() {
-        return Collections.unmodifiableList(eventos);
-    }
-
     @Override
     public String visualizarPerfil() {
         String perfilBase = super.visualizarPerfil();
@@ -81,21 +77,6 @@ public class UsuarioOrganizador extends Usuario {
         return perfilBase;
     }
 
-    /*public void alterarEvento(long eventoId, Evento novosDados) {
-        Evento evento = eventos.stream()
-                .filter(e -> e.getId() == eventoId)
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("Evento nao encontrado para este organizador."));
-        evento.alterarDados(novosDados);
-    }*/
-
-    /*public List<Evento> listarEventosOrganizador() {
-        return this.eventos.stream()
-                .sorted(Comparator
-                        .comparing(Evento::getDataInicio)
-                        .thenComparing(Evento::getNome, String.CASE_INSENSITIVE_ORDER))
-                .collect(Collectors.toList());
-    }*/
 
     @Override
     public String toString() {

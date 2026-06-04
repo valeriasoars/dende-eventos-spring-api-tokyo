@@ -51,7 +51,6 @@ public class Ingresso {
         return new Ingresso(evento, usuario, valorPago);
     }
 
-
     public BigDecimal cancelarIngresso() {
         if (!Boolean.TRUE.equals(evento.getPermiteEstorno()))
             throw new IllegalStateException("Evento não permite estorno.");
@@ -64,11 +63,6 @@ public class Ingresso {
     public void cancelarPorEvento() {
         if (this.status != StatusIngresso.ATIVO) return;
         this.status = StatusIngresso.CANCELADO_PELO_EVENTO;
-    }
-
-    public boolean estaCancelado() {
-        return this.status == StatusIngresso.CANCELADO_PELO_USUARIO
-                || this.status == StatusIngresso.CANCELADO_PELO_EVENTO;
     }
 
     public static BigDecimal calcularValorTotal(List<Ingresso> ingressos) {
